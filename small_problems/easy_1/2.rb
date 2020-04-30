@@ -23,10 +23,10 @@
   alg:
     - make input absolute
     - check if odd
+
+  further exploration: use remainder instead of modulus
 =end
 
 def is_odd?(integer)
-  integer % 2 == 1
+  integer.abs.remainder(2) == 1
 end
-
-# shortest is integer.odd?
