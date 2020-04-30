@@ -26,7 +26,7 @@
 =end
 
 def is_odd?(integer)
-  integer.abs % 2 == 1
+  integer % 2 == 1
 end
 
 # shortest is integer.odd?
