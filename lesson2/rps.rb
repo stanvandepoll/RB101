@@ -1,24 +1,45 @@
 require 'pry'
 
-VALID_CHOICES = %w[rock paper scissors]
+VALID_CHOICES = %w[rock paper scissors lizard spock]
 
 def prompt(message)
   puts "=> #{message}"
 end
 
-def display_result(choice, computer_choice)
+def determine_winner(choice, computer_choice)
   if won?(choice, computer_choice)
-    prompt('You won!')
+    'player'
   elsif won?(computer_choice, choice)
-    prompt('Computer won!')
-  else
-    prompt("It's a tie!")
+    'computer'
   end
 end
 
+def display_result(winner)
+  return prompt("It's a tie!") unless winner
+
+  prompt("#{winner} won the round!")
+end
+
+def adjust_score(score, winner)
+  return unless winner
+
+  score[winner.to_sym] += 1
+end
+
+def display_score(score)
+  prompt("Score is: #{score.inspect}")
+end
+
 def won?(player_choice, opponent_choice)
-  [['rock', 'scissors'], ['scissors', 'paper'], ['paper', 'rock']]
-    .include?([player_choice, opponent_choice])
+  winning_combinations = {
+    rock: ['scissors', 'lizard'],
+    paper: ['rock', 'spock'],
+    scissors: ['paper', 'lizard'],
+    lizard: ['paper', 'spock'],
+    spock: ['scissors', 'rock']
+  }
+  winning_combinations[player_choice.to_sym]
+    .include?(opponent_choice)
 end
 
 def ask_choice
@@ -36,15 +57,25 @@ def ask_choice
   choice
 end
 
-prompt('Get ready for Rock Paper Scissors!!! <=')
+prompt('Get ready for Rock Paper Scissors Lizard Spock!!! <=')
+score = { player: 0, computer: 0 }
 
 loop do
-  choice = ask_choice
-  computer_choice = VALID_CHOICES.sample
+  loop do
+    choice = ask_choice
+    computer_choice = VALID_CHOICES.sample
 
-  prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
+    prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
 
-  display_result(choice, computer_choice)
+    winner = determine_winner(choice, computer_choice)
+    display_result(winner)
+    adjust_score(score, winner)
+    display_score(score)
+
+    break if score[:player] > 4 || score[:computer] > 4
+  end
+  game_winner = score[:player] > 4 ? 'You' : 'Computer'
+  prompt("#{game_winner} won the game!")
 
   prompt('Do you want to play again?')
   answer = gets.chomp
