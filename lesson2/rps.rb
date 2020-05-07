@@ -9,21 +9,16 @@ end
 def display_result(choice, computer_choice)
   if won?(choice, computer_choice)
     prompt('You won!')
-  elsif lost?(choice, computer_choice)
+  elsif won?(computer_choice, choice)
     prompt('Computer won!')
   else
     prompt("It's a tie!")
   end
 end
 
-def won?(choice, computer_choice)
-  [['rock', 'scissors'], ['paper', 'rock'], ['scissors', 'paper']]
-    .include?([choice, computer_choice])
-end
-
-def lost?(choice, computer_choice)
-  [['rock', 'paper'], ['paper', 'scissors'], ['scissors', 'rock']]
-    .include?([choice, computer_choice])
+def won?(player_choice, opponent_choice)
+  [['rock', 'scissors'], ['scissors', 'paper'], ['paper', 'rock']]
+    .include?([player_choice, opponent_choice])
 end
 
 def ask_choice
