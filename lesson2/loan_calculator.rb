@@ -39,7 +39,7 @@ def monthly_payment(amount:, interest_rate:, years:)
     (1 - (1 + monthly_interest_rate)**(-months)))
 end
 
-def wants_to_continue
+def wants_to_continue?
   prompt("Would you like to make another calculation? 'y' to repeat")
   answer = gets.chomp
 
@@ -62,7 +62,7 @@ loop do
   formatted_payment = format('%02.2<payment>f', payment: monthly_payment)
   prompt("The monthly payment will be: €#{formatted_payment}")
 
-  break unless wants_to_continue
+  break unless wants_to_continue?
 end
 
 prompt("Thank you for using the Loan Calculator!")
