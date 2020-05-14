@@ -92,45 +92,63 @@ def busted?(hand)
   total(hand) > 21
 end
 
-cards = deck.shuffle
-player_cards = [cards.pop, cards.pop]
-dealer_cards = [cards.pop, cards.pop]
+def play_again?
+  puts "-------------"
+  puts "Do you want to play again? (y or n)"
+  answer = gets.chomp
+  answer.downcase.start_with?('y')
+end
+
 puts "Welcome to 21"
 
 loop do
-  display_round(player_cards, dealer_cards)
-  puts "hit or stay?"
-  answer = gets.chomp
-  break if answer == 'stay'
+  cards = deck.shuffle
+  player_cards = [cards.pop, cards.pop]
+  dealer_cards = [cards.pop, cards.pop]
 
-  player_cards.append(cards.pop)
-  break if busted?(player_cards)
+  loop do
+    display_round(player_cards, dealer_cards)
+    answer = nil
+    loop do
+      puts "Would you like to (h)it or (s)tay?"
+      answer = gets.chomp.downcase
+      break if ['h', 's'].include?(answer)
+
+      puts "Sorry, must enter 'h' or 's'."
+    end
+    break if answer == 's'
+
+    player_cards.append(cards.pop)
+    break if busted?(player_cards)
+  end
+
+  if busted?(player_cards)
+    puts "You went bust with a #{player_cards.last.last}"
+  else
+    puts "You chose to stay!"
+  end
+
+  puts "Dealer's turn..."
+  sleep(2)
+
+  loop do
+    break if total(dealer_cards) >= 17 ||
+             busted?(dealer_cards) ||
+             busted?(player_cards)
+
+    puts 'Dealer hits'
+    dealer_cards.append(cards.pop)
+    display_round(player_cards, dealer_cards, true)
+    sleep(5)
+  end
+
+  if busted?(dealer_cards)
+    puts "Dealer went bust with a #{dealer_cards.last.last}"
+  else
+    puts "Dealer chose to stay!"
+  end
+
+  puts call_winner(player_cards, dealer_cards)
+
+  break unless play_again?
 end
-
-if busted?(player_cards)
-  puts "You went bust with a #{player_cards.last.last}"
-else
-  puts "You chose to stay!"
-end
-
-puts "Dealer's turn..."
-sleep(2)
-
-loop do
-  break if total(dealer_cards) >= 17 ||
-           busted?(dealer_cards) ||
-           busted?(player_cards)
-
-  puts 'Dealer hits'
-  dealer_cards.append(cards.pop)
-  display_round(player_cards, dealer_cards, true)
-  sleep(5)
-end
-
-if busted?(dealer_cards)
-  puts "Dealer went bust with a #{dealer_cards.last.last}"
-else
-  puts "Dealer chose to stay!"
-end
-
-puts call_winner(player_cards, dealer_cards)
