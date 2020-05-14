@@ -108,6 +108,8 @@ loop do
 
   loop do
     display_round(player_cards, dealer_cards)
+    break if busted?(player_cards)
+
     answer = nil
     loop do
       puts "Would you like to (h)it or (s)tay?"
@@ -119,7 +121,6 @@ loop do
     break if answer == 's'
 
     player_cards.append(cards.pop)
-    break if busted?(player_cards)
   end
 
   if busted?(player_cards)
