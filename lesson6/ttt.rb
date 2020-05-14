@@ -10,7 +10,11 @@
 # 10. Good bye!
 require 'pry'
 
-board = [[' ', ' ', ' '], [' ', ' ', ' '], [' ', ' ', ' ']]
+INITIAL_MARKER = ' '
+PLAYER_MARKER = 'X'
+COMPUTER_MARKER = 'O'
+
+board = Array.new(3) { Array.new(3) { INITIAL_MARKER.dup } }
 
 def display_board(board)
   puts %{
@@ -30,7 +34,7 @@ end
 
 def player_marks_square(board)
   selection = get_selection(board)
-  board.flatten[selection].gsub!(' ', 'X')
+  board.flatten[selection].gsub!(INITIAL_MARKER, PLAYER_MARKER)
 end
 
 def get_selection(board)
@@ -40,13 +44,14 @@ def get_selection(board)
     selection = gets.chomp.to_i
     break if (1..9).cover?(selection) &&
              square_available?(choice: selection, board: board)
+
     prompt 'Invalid choice, please choose again'
   end
   selection - 1
 end
 
 def square_available?(choice:, board:)
-  board.flatten[choice - 1] == ' '
+  board.flatten[choice - 1] == INITIAL_MARKER
 end
 
 def prompt(string)
@@ -55,3 +60,4 @@ end
 
 display_board(board)
 player_marks_square(board)
+display_board(board)
