@@ -34,33 +34,33 @@ def player_marks_square!(board)
   selection = get_selection(board)
   board[selection] = PLAYER_MARKER
 end
-# continue board refactor from here
+
 def get_selection(board)
-  prompt 'Place a marker (1-9)'
+  prompt "Place a marker #{available_squares(board).join(', ')}"
   selection = ''
   loop do
     selection = gets.chomp.to_i
-    break if (1..9).cover?(selection) &&
-             square_available?(choice: selection, board: board)
+    break if square_available?(choice: selection, board: board)
 
     prompt 'Invalid choice, please choose again'
   end
-  selection - 1
+  selection
 end
 
 def square_available?(choice:, board:)
-  board.flatten[choice - 1] == INITIAL_MARKER
+  available_squares(board).include?(choice)
+end
+
+def available_squares(board)
+  board.keys.select {|num| board[num] == INITIAL_MARKER}
 end
 
 def computer_marks_square!(board)
-  board.flatten
-       .select { |el| el == INITIAL_MARKER }
-       .sample
-       &.gsub!(INITIAL_MARKER, COMPUTER_MARKER)
+  board[available_squares(board).sample] = COMPUTER_MARKER
 end
 
 def board_full?(board)
-  board.flatten.select { |el| el == INITIAL_MARKER }.empty?
+  board.values.select { |el| el == INITIAL_MARKER }.empty?
 end
 
 def detect_winner(board)
@@ -69,40 +69,33 @@ def detect_winner(board)
     vertical_lines(board) +
     diagonal_lines(board)
 
-  return 'player' if player_won?(winning_lines)
-  return 'computer' if computer_won?(winning_lines)
+  return 'player' if player_won?(board, winning_lines)
+  return 'computer' if computer_won?(board, winning_lines)
 
   false
 end
 
 def horizontal_lines(board)
-  [board[0], board[1], board[2]]
+  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 end
 
 def vertical_lines(board)
-  [
-    [board[0][0], board[1][0], board[2][0]],
-    [board[0][1], board[1][1], board[2][1]],
-    [board[0][2], board[1][2], board[2][2]]
-  ]
+  [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 end
 
 def diagonal_lines(board)
-  [
-    (0..2).collect { |i| board[i][i] },
-    (0..2).collect { |i| board[i][-(1 + i)] }
-  ]
+  [[1, 5, 9], [3, 5, 7]]
 end
 
-def player_won?(winning_lines)
+def player_won?(board, winning_lines)
   winning_lines.any? do |line|
-    line.all? { |el| el == PLAYER_MARKER }
+    line.all? { |num| board[num] == PLAYER_MARKER }
   end
 end
 
-def computer_won?(winning_lines)
+def computer_won?(board, winning_lines)
   winning_lines.any? do |line|
-    line.all? { |el| el == COMPUTER_MARKER }
+    line.all? { |num| board[num] == COMPUTER_MARKER }
   end
 end
 
@@ -120,20 +113,22 @@ prompt "Welcome to Tic Tac Toe. Let's get started!"
 
 loop do
   board = initialize_board
-  display_board(board)
 
   loop do
-    player_marks_square!(board)
-    computer_marks_square!(board)
     display_board(board)
-    winner = detect_winner(board)
-    if winner
-      prompt "#{winner} won!"
-      break
-    elsif board_full?(board)
-      prompt "It's a tie!"
-      break
-    end
+    player_marks_square!(board)
+    break if detect_winner(board) || board_full?(board)
+
+    computer_marks_square!(board)
+    break if detect_winner(board)
+  end
+
+  display_board(board)
+  winner = detect_winner(board)
+  if winner
+    prompt "#{winner} won!"
+  elsif board_full?(board)
+    prompt "It's a tie!"
   end
 
   prompt 'Play again?'
