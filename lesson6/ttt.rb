@@ -124,7 +124,8 @@ loop do
     player_marks_square!(board)
     computer_marks_square!(board)
     display_board(board)
-    if (winner = detect_winner(board))
+    winner = detect_winner(board)
+    if winner
       prompt "#{winner} won!"
       break
     elsif board_full?(board)
