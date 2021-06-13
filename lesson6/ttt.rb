@@ -14,31 +14,27 @@ INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 
-def display_board(board)
+def display_board(brd)
   puts %{
 (1)|(2)|(3)
-#{markers_line(board, 0)}
+ #{brd[1]} | #{brd[2]} | #{brd[3]}
    |   |
 ---+---+---
 (4)|(5)|(6)
-#{markers_line(board, 1)}
+ #{brd[4]} | #{brd[5]} | #{brd[6]}
    |   |
 ---+---+---
 (7)|(8)|(9)
-#{markers_line(board, 2)}
+ #{brd[7]} | #{brd[8]} | #{brd[9]}
    |   |
   }
 end
 
-def markers_line(board, nbr)
-  " #{board[nbr][0]} | #{board[nbr][1]} | #{board[nbr][2]} "
-end
-
 def player_marks_square!(board)
   selection = get_selection(board)
-  board.flatten[selection].gsub!(INITIAL_MARKER, PLAYER_MARKER)
+  board[selection] = PLAYER_MARKER
 end
-
+# continue board refactor from here
 def get_selection(board)
   prompt 'Place a marker (1-9)'
   selection = ''
@@ -114,10 +110,16 @@ def prompt(string)
   puts "==> #{string}"
 end
 
+def initialize_board
+  new_board = {}
+  (1..9).each {|num| new_board[num] = INITIAL_MARKER}
+  new_board
+end
+
 prompt "Welcome to Tic Tac Toe. Let's get started!"
 
 loop do
-  board = Array.new(3) { Array.new(3) { INITIAL_MARKER.dup } }
+  board = initialize_board
   display_board(board)
 
   loop do
