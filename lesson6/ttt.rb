@@ -111,7 +111,16 @@ def initialize_board
 end
 
 prompt "Welcome to Tic Tac Toe. Let's get started!"
-prompt 'We will play to first 5 wins'
+prompt 'Till how many wins would you like to play? (max 20)'
+
+win_limit = ''
+loop do
+  win_limit = gets.chomp.to_i
+  break if (1..20).cover?(win_limit)
+
+  prompt 'Invalid choice, please choose again'
+end
+WIN_LOOP_LIMIT = win_limit
 
 loop do
   player_wins = 0
@@ -143,7 +152,7 @@ loop do
       prompt "It's a tie!"
     end
 
-    break if player_wins > 4 || computer_wins > 4
+    break if player_wins >= WIN_LOOP_LIMIT || computer_wins >= WIN_LOOP_LIMIT
 
     prompt "Score is player #{player_wins}, computer #{computer_wins}"
     prompt 'Starting new game...'
