@@ -75,10 +75,12 @@ def computer_marks_square!(board)
     board[offensive_square] = COMPUTER_MARKER
     return
   end
-  
+
   defensive_square = check_defensive_moves(board)
   if defensive_square
     board[defensive_square] = COMPUTER_MARKER
+  elsif available_squares(board).include?(5)
+    board[5] = COMPUTER_MARKER
   else
     board[available_squares(board).sample] = COMPUTER_MARKER
   end
