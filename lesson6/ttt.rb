@@ -17,6 +17,7 @@ COMPUTER_MARKER = 'O'
 HORIZONTAL_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 VERTICAL_LINES = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 DIAGONAL_LINES = [[1, 5, 9], [3, 5, 7]]
+WINNING_LINES = HORIZONTAL_LINES + VERTICAL_LINES + DIAGONAL_LINES
 
 def display_board(brd)
   puts %{
@@ -69,7 +70,27 @@ def available_squares(board)
 end
 
 def computer_marks_square!(board)
-  board[available_squares(board).sample] = COMPUTER_MARKER
+  defensive_square = check_defensive_moves(board)
+  if defensive_square
+    board[defensive_square] = COMPUTER_MARKER
+  else
+    board[available_squares(board).sample] = COMPUTER_MARKER
+  end
+end
+
+def check_defensive_moves(board)
+  defensive_square = nil
+
+  WINNING_LINES.each do |line|
+    line_values = board.values_at(*line)
+    if line_values.count(PLAYER_MARKER) == 2 && line_values.count(INITIAL_MARKER) == 1
+      defensive_line_index = line_values.index(INITIAL_MARKER)
+      defensive_square = line[defensive_line_index]
+      break
+    end
+  end
+
+  defensive_square
 end
 
 def board_full?(board)
@@ -77,25 +98,20 @@ def board_full?(board)
 end
 
 def detect_winner(board)
-  winning_lines =
-    HORIZONTAL_LINES +
-    VERTICAL_LINES +
-    DIAGONAL_LINES
-
-  return 'player' if player_won?(board, winning_lines)
-  return 'computer' if computer_won?(board, winning_lines)
+  return 'player' if player_won?(board)
+  return 'computer' if computer_won?(board)
 
   false
 end
 
-def player_won?(board, winning_lines)
-  winning_lines.any? do |line|
+def player_won?(board)
+  WINNING_LINES.any? do |line|
     line.all? { |num| board[num] == PLAYER_MARKER }
   end
 end
 
-def computer_won?(board, winning_lines)
-  winning_lines.any? do |line|
+def computer_won?(board)
+  WINNING_LINES.any? do |line|
     line.all? { |num| board[num] == COMPUTER_MARKER }
   end
 end
