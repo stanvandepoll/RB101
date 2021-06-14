@@ -149,6 +149,21 @@ def initialize_board
   new_board
 end
 
+def set_starter(previous_starter)
+  case STARTER_SETTING
+  when :player then :player
+  when :computer then :computer
+  when :alternate
+    if previous_starter
+      previous_starter == :player ? :computer : :player
+    else
+      %i[player computer].sample
+    end
+  when :random
+    %i[player computer].sample
+  end
+end
+
 prompt "Welcome to Tic Tac Toe. Let's get started!"
 prompt 'Till how many wins would you like to play? (max 20)'
 
@@ -161,19 +176,33 @@ loop do
 end
 WIN_LOOP_LIMIT = win_limit
 
+prompt 'Who may start? p = player, c = computer, a = alternate, r = random'
+starter_choice = ''
+loop do
+  starter_choice = gets.chomp.to_sym
+  break if %i[p c a r].include?(starter_choice)
+
+  prompt 'Invalid choice, please choose again'
+end
+starter_translation = { p: :player, c: :computer, a: :alternate, r: :random }
+STARTER_SETTING = starter_translation[starter_choice]
+
 loop do
   player_win_count = 0
   computer_win_count = 0
+  starter = nil
 
   loop do
     board = initialize_board
+    starter = set_starter(starter)
 
     loop do
-      display_board(board)
-      player_marks_square!(board)
+      display_board(board) if starter == :player
+      starter == :player ? player_marks_square!(board) : computer_marks_square!(board)
       break if detect_winner(board) || board_full?(board)
 
-      computer_marks_square!(board)
+      display_board(board) if starter == :computer
+      starter == :player ? computer_marks_square!(board) : player_marks_square!(board)
       break if detect_winner(board)
     end
 
