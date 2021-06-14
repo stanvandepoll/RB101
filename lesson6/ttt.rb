@@ -40,7 +40,7 @@ def player_marks_square!(board)
 end
 
 def get_selection(board)
-  prompt "Place a marker #{available_squares(board).join(', ')}"
+  prompt "Place a marker #{join_or(available_squares(board))}"
   selection = ''
   loop do
     selection = gets.chomp.to_i
@@ -49,6 +49,15 @@ def get_selection(board)
     prompt 'Invalid choice, please choose again'
   end
   selection
+end
+
+def join_or(array, delimiter=', ', end_word='or')
+  case array.size
+  when 0 then ''
+  when 1 then array.first
+  when 2 then array.join(" #{end_word} ")
+  else array[0..-2].join(delimiter) + "#{delimiter}#{end_word} #{array.last}"
+  end
 end
 
 def square_available?(choice:, board:)
