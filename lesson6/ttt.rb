@@ -70,6 +70,12 @@ def available_squares(board)
 end
 
 def computer_marks_square!(board)
+  offensive_square = check_offensive_moves(board)
+  if offensive_square
+    board[offensive_square] = COMPUTER_MARKER
+    return
+  end
+  
   defensive_square = check_defensive_moves(board)
   if defensive_square
     board[defensive_square] = COMPUTER_MARKER
@@ -91,6 +97,21 @@ def check_defensive_moves(board)
   end
 
   defensive_square
+end
+
+def check_offensive_moves(board)
+  offensive_square = nil
+
+  WINNING_LINES.each do |line|
+    line_values = board.values_at(*line)
+    if line_values.count(COMPUTER_MARKER) == 2 && line_values.count(INITIAL_MARKER) == 1
+      offensive_line_index = line_values.index(INITIAL_MARKER)
+      offensive_square = line[offensive_line_index]
+      break
+    end
+  end
+
+  offensive_square
 end
 
 def board_full?(board)
@@ -139,8 +160,8 @@ end
 WIN_LOOP_LIMIT = win_limit
 
 loop do
-  player_wins = 0
-  computer_wins = 0
+  player_win_count = 0
+  computer_win_count = 0
 
   loop do
     board = initialize_board
@@ -158,9 +179,9 @@ loop do
     winner = detect_winner(board)
     if winner
       if winner == 'player'
-        player_wins += 1
+        player_win_count += 1
       else
-        computer_wins += 1
+        computer_win_count += 1
       end
 
       prompt "#{winner} won!"
@@ -168,14 +189,14 @@ loop do
       prompt "It's a tie!"
     end
 
-    break if player_wins >= WIN_LOOP_LIMIT || computer_wins >= WIN_LOOP_LIMIT
+    break if player_win_count >= WIN_LOOP_LIMIT || computer_win_count >= WIN_LOOP_LIMIT
 
-    prompt "Score is player #{player_wins}, computer #{computer_wins}"
+    prompt "Score is player #{player_win_count}, computer #{computer_win_count}"
     prompt 'Starting new game...'
     sleep 2
   end
 
-  prompt "Final score is player: #{player_wins} vs computer: #{computer_wins}"
+  prompt "Final score is player: #{player_win_count} vs computer: #{computer_win_count}"
   prompt 'Play again?'
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
