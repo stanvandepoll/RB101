@@ -14,6 +14,10 @@ INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
 
+HORIZONTAL_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+VERTICAL_LINES = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+DIAGONAL_LINES = [[1, 5, 9], [3, 5, 7]]
+
 def display_board(brd)
   puts %{
 (1)|(2)|(3)
@@ -52,7 +56,7 @@ def square_available?(choice:, board:)
 end
 
 def available_squares(board)
-  board.keys.select {|num| board[num] == INITIAL_MARKER}
+  board.keys.select { |num| board[num] == INITIAL_MARKER }
 end
 
 def computer_marks_square!(board)
@@ -65,26 +69,14 @@ end
 
 def detect_winner(board)
   winning_lines =
-    horizontal_lines(board) +
-    vertical_lines(board) +
-    diagonal_lines(board)
+    HORIZONTAL_LINES +
+    VERTICAL_LINES +
+    DIAGONAL_LINES
 
   return 'player' if player_won?(board, winning_lines)
   return 'computer' if computer_won?(board, winning_lines)
 
   false
-end
-
-def horizontal_lines(board)
-  [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-end
-
-def vertical_lines(board)
-  [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
-end
-
-def diagonal_lines(board)
-  [[1, 5, 9], [3, 5, 7]]
 end
 
 def player_won?(board, winning_lines)
@@ -105,7 +97,7 @@ end
 
 def initialize_board
   new_board = {}
-  (1..9).each {|num| new_board[num] = INITIAL_MARKER}
+  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
