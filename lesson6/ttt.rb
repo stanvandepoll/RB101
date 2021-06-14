@@ -111,27 +111,46 @@ def initialize_board
 end
 
 prompt "Welcome to Tic Tac Toe. Let's get started!"
+prompt 'We will play to first 5 wins'
 
 loop do
-  board = initialize_board
+  player_wins = 0
+  computer_wins = 0
 
   loop do
+    board = initialize_board
+
+    loop do
+      display_board(board)
+      player_marks_square!(board)
+      break if detect_winner(board) || board_full?(board)
+
+      computer_marks_square!(board)
+      break if detect_winner(board)
+    end
+
     display_board(board)
-    player_marks_square!(board)
-    break if detect_winner(board) || board_full?(board)
+    winner = detect_winner(board)
+    if winner
+      if winner == 'player'
+        player_wins += 1
+      else
+        computer_wins += 1
+      end
 
-    computer_marks_square!(board)
-    break if detect_winner(board)
+      prompt "#{winner} won!"
+    elsif board_full?(board)
+      prompt "It's a tie!"
+    end
+
+    break if player_wins > 4 || computer_wins > 4
+
+    prompt "Score is player #{player_wins}, computer #{computer_wins}"
+    prompt 'Starting new game...'
+    sleep 2
   end
 
-  display_board(board)
-  winner = detect_winner(board)
-  if winner
-    prompt "#{winner} won!"
-  elsif board_full?(board)
-    prompt "It's a tie!"
-  end
-
+  prompt "Final score is player: #{player_wins} vs computer: #{computer_wins}"
   prompt 'Play again?'
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
