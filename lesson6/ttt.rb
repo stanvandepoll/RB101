@@ -1,13 +1,3 @@
-# 1. Display the initial empty 3x3 board.
-# 2. Ask the user to mark a square.
-# 3. Computer marks a square.
-# 4. Display the updated board state.
-# 5. If winner, display winner.
-# 6. If board is full, display tie.
-# 7. If neither winner nor board is full, go to #2
-# 8. Play again?
-# 9. If yes, go to #1
-# 10. Good bye!
 require 'pry'
 
 INITIAL_MARKER = ' '
@@ -164,6 +154,14 @@ def set_starter(previous_starter)
   end
 end
 
+def place_piece!(board, current_player)
+  current_player == :player ? player_marks_square!(board) : computer_marks_square!(board)
+end
+
+def alternate_player(current_player)
+  current_player == :player ? :computer : :player
+end
+
 prompt "Welcome to Tic Tac Toe. Let's get started!"
 prompt 'Till how many wins would you like to play? (max 20)'
 
@@ -195,15 +193,13 @@ loop do
   loop do
     board = initialize_board
     starter = set_starter(starter)
+    current_player = starter
 
     loop do
-      display_board(board) if starter == :player
-      starter == :player ? player_marks_square!(board) : computer_marks_square!(board)
+      display_board(board)
+      place_piece!(board, current_player)
+      current_player = alternate_player(current_player)
       break if detect_winner(board) || board_full?(board)
-
-      display_board(board) if starter == :computer
-      starter == :player ? computer_marks_square!(board) : player_marks_square!(board)
-      break if detect_winner(board)
     end
 
     display_board(board)
