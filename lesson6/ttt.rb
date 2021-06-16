@@ -71,7 +71,7 @@ def computer_marks_square!(board)
 end
 
 def perform_offensive_move(board)
-  offensive_square = check_offensive_moves(board)
+  offensive_square = square_at_risk(board, COMPUTER_MARKER)
   if offensive_square
     board[offensive_square] = COMPUTER_MARKER
     true
@@ -80,46 +80,36 @@ def perform_offensive_move(board)
   end
 end
 
-def check_offensive_moves(board)
-  offensive_square = nil
+def square_at_risk(board, marking)
+  square_number = nil
 
   WINNING_LINES.each do |line|
-    line_values = board.values_at(*line)
-    if line_values.count(COMPUTER_MARKER) == 2 &&
-       line_values.count(INITIAL_MARKER) == 1
-      offensive_line_index = line_values.index(INITIAL_MARKER)
-      offensive_square = line[offensive_line_index]
-      break
-    end
+    square_number = at_risk_square_in(
+      line: line, board: board, marking: marking
+    )
+    break if square_number
   end
 
-  offensive_square
+  square_number
+end
+
+def at_risk_square_in(line:, board:, marking:)
+  line_values = board.values_at(*line)
+  if line_values.count(marking) == 2 &&
+     line_values.count(INITIAL_MARKER) == 1
+    at_risk_line_index = line_values.index(INITIAL_MARKER)
+    line[at_risk_line_index]
+  end
 end
 
 def perform_defensive_move(board)
-  defensive_square = check_defensive_moves(board)
+  defensive_square = square_at_risk(board, PLAYER_MARKER)
   if defensive_square
     board[defensive_square] = COMPUTER_MARKER
     true
   else
     false
   end
-end
-
-def check_defensive_moves(board)
-  defensive_square = nil
-
-  WINNING_LINES.each do |line|
-    line_values = board.values_at(*line)
-    if line_values.count(PLAYER_MARKER) == 2 &&
-       line_values.count(INITIAL_MARKER) == 1
-      defensive_line_index = line_values.index(INITIAL_MARKER)
-      defensive_square = line[defensive_line_index]
-      break
-    end
-  end
-
-  defensive_square
 end
 
 def board_full?(board)
