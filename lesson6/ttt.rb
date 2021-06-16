@@ -32,14 +32,14 @@ end
 
 def get_selection(board)
   prompt "Place a marker #{join_or(available_squares(board))}"
-  selection = ''
+  selected_square = ''
   loop do
-    selection = gets.chomp.to_i
-    break if square_available?(choice: selection, board: board)
+    selected_square = gets.chomp.to_i
+    break if square_available?(selected_square: selected_square, board: board)
 
     prompt 'Invalid choice, please choose again'
   end
-  selection
+  selected_square
 end
 
 def join_or(array, delimiter=', ', end_word='or')
@@ -51,8 +51,8 @@ def join_or(array, delimiter=', ', end_word='or')
   end
 end
 
-def square_available?(choice:, board:)
-  available_squares(board).include?(choice)
+def square_available?(selected_square:, board:)
+  available_squares(board).include?(selected_square)
 end
 
 def available_squares(board)
@@ -60,19 +60,49 @@ def available_squares(board)
 end
 
 def computer_marks_square!(board)
-  offensive_square = check_offensive_moves(board)
-  if offensive_square
-    board[offensive_square] = COMPUTER_MARKER
-    return
-  end
+  return if perform_offensive_move(board)
+  return if perform_defensive_move(board)
 
-  defensive_square = check_defensive_moves(board)
-  if defensive_square
-    board[defensive_square] = COMPUTER_MARKER
-  elsif available_squares(board).include?(5)
+  if available_squares(board).include?(5)
     board[5] = COMPUTER_MARKER
   else
     board[available_squares(board).sample] = COMPUTER_MARKER
+  end
+end
+
+def perform_offensive_move(board)
+  offensive_square = check_offensive_moves(board)
+  if offensive_square
+    board[offensive_square] = COMPUTER_MARKER
+    true
+  else
+    false
+  end
+end
+
+def check_offensive_moves(board)
+  offensive_square = nil
+
+  WINNING_LINES.each do |line|
+    line_values = board.values_at(*line)
+    if line_values.count(COMPUTER_MARKER) == 2 &&
+       line_values.count(INITIAL_MARKER) == 1
+      offensive_line_index = line_values.index(INITIAL_MARKER)
+      offensive_square = line[offensive_line_index]
+      break
+    end
+  end
+
+  offensive_square
+end
+
+def perform_defensive_move(board)
+  defensive_square = check_defensive_moves(board)
+  if defensive_square
+    board[defensive_square] = COMPUTER_MARKER
+    true
+  else
+    false
   end
 end
 
@@ -90,22 +120,6 @@ def check_defensive_moves(board)
   end
 
   defensive_square
-end
-
-def check_offensive_moves(board)
-  offensive_square = nil
-
-  WINNING_LINES.each do |line|
-    line_values = board.values_at(*line)
-    if line_values.count(COMPUTER_MARKER) == 2 &&
-       line_values.count(INITIAL_MARKER) == 1
-      offensive_line_index = line_values.index(INITIAL_MARKER)
-      offensive_square = line[offensive_line_index]
-      break
-    end
-  end
-
-  offensive_square
 end
 
 def board_full?(board)
