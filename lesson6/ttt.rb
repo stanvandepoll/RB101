@@ -81,7 +81,8 @@ def check_defensive_moves(board)
 
   WINNING_LINES.each do |line|
     line_values = board.values_at(*line)
-    if line_values.count(PLAYER_MARKER) == 2 && line_values.count(INITIAL_MARKER) == 1
+    if line_values.count(PLAYER_MARKER) == 2 &&
+       line_values.count(INITIAL_MARKER) == 1
       defensive_line_index = line_values.index(INITIAL_MARKER)
       defensive_square = line[defensive_line_index]
       break
@@ -96,7 +97,8 @@ def check_offensive_moves(board)
 
   WINNING_LINES.each do |line|
     line_values = board.values_at(*line)
-    if line_values.count(COMPUTER_MARKER) == 2 && line_values.count(INITIAL_MARKER) == 1
+    if line_values.count(COMPUTER_MARKER) == 2 &&
+       line_values.count(INITIAL_MARKER) == 1
       offensive_line_index = line_values.index(INITIAL_MARKER)
       offensive_square = line[offensive_line_index]
       break
@@ -139,23 +141,27 @@ def initialize_board
   new_board
 end
 
-def set_starter(previous_starter)
+def pick_starter(previous_starter)
   case STARTER_SETTING
   when :player then :player
   when :computer then :computer
   when :alternate
     if previous_starter
-      previous_starter == :player ? :computer : :player
+      alternate_player(previous_starter)
     else
-      %i[player computer].sample
+      %i(player computer).sample
     end
   when :random
-    %i[player computer].sample
+    %i(player computer).sample
   end
 end
 
 def place_piece!(board, current_player)
-  current_player == :player ? player_marks_square!(board) : computer_marks_square!(board)
+  if current_player == :player
+    player_marks_square!(board)
+  else
+    computer_marks_square!(board)
+  end
 end
 
 def alternate_player(current_player)
@@ -178,7 +184,7 @@ prompt 'Who may start? p = player, c = computer, a = alternate, r = random'
 starter_choice = ''
 loop do
   starter_choice = gets.chomp.to_sym
-  break if %i[p c a r].include?(starter_choice)
+  break if %i(p c a r).include?(starter_choice)
 
   prompt 'Invalid choice, please choose again'
 end
@@ -192,7 +198,7 @@ loop do
 
   loop do
     board = initialize_board
-    starter = set_starter(starter)
+    starter = pick_starter(starter)
     current_player = starter
 
     loop do
@@ -216,14 +222,16 @@ loop do
       prompt "It's a tie!"
     end
 
-    break if player_win_count >= WIN_LOOP_LIMIT || computer_win_count >= WIN_LOOP_LIMIT
+    break if player_win_count >= WIN_LOOP_LIMIT ||
+             computer_win_count >= WIN_LOOP_LIMIT
 
     prompt "Score is player #{player_win_count}, computer #{computer_win_count}"
     prompt 'Starting new game...'
     sleep 2
   end
 
-  prompt "Final score is player: #{player_win_count} vs computer: #{computer_win_count}"
+  prompt "Final score is player: #{player_win_count}"\
+         " vs computer: #{computer_win_count}"
   prompt 'Play again?'
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
