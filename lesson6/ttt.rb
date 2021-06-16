@@ -26,11 +26,11 @@ def display_board(brd)
 end
 
 def player_marks_square!(board)
-  selection = get_selection(board)
+  selection = input_selection(board)
   board[selection] = PLAYER_MARKER
 end
 
-def get_selection(board)
+def input_selection(board)
   prompt "Place a marker #{join_or(available_squares(board))}"
   selected_square = ''
   loop do
@@ -124,14 +124,16 @@ def detect_winner(board)
 end
 
 def player_won?(board)
-  WINNING_LINES.any? do |line|
-    line.all? { |num| board[num] == PLAYER_MARKER }
-  end
+  winning_line_filled?(board, PLAYER_MARKER)
 end
 
 def computer_won?(board)
+  winning_line_filled?(board, COMPUTER_MARKER)
+end
+
+def winning_line_filled?(board, marker)
   WINNING_LINES.any? do |line|
-    line.all? { |num| board[num] == COMPUTER_MARKER }
+    line.all? { |num| board[num] == marker }
   end
 end
 
@@ -172,32 +174,67 @@ def alternate_player(current_player)
   current_player == :player ? :computer : :player
 end
 
+def input_win_limit
+  prompt 'Till how many wins would you like to play? (max 20)'
+
+  win_limit = ''
+  loop do
+    win_limit = gets.chomp.to_i
+    break if (1..20).cover?(win_limit)
+
+    prompt 'Invalid choice, please choose again'
+  end
+  win_limit
+end
+
+def input_starter_setting
+  prompt 'Who may start? p = player, c = computer, a = alternate, r = random'
+
+  starter_choice = ''
+  loop do
+    starter_choice = gets.chomp.to_sym
+    break if %i(p c a r).include?(starter_choice)
+
+    prompt 'Invalid choice, please choose again'
+  end
+
+  starter_translation = { p: :player, c: :computer, a: :alternate, r: :random }
+  starter_translation[starter_choice]
+end
+
+def perform_turn(board, current_player)
+  display_board(board)
+  place_piece!(board, current_player)
+end
+
+def process_round_score(board, win_counts)
+  winner = detect_winner(board)
+  if winner
+    if winner == 'player'
+      win_counts[:player] += 1
+    else
+      win_counts[:computer] += 1
+    end
+
+    prompt "#{winner} won!"
+  elsif board_full?(board)
+    prompt "It's a tie!"
+  end
+end
+
+def win_limit_reached?(win_counts)
+  win_counts[:player] >= WIN_LIMIT ||
+    win_counts[:computer] >= WIN_LIMIT
+end
+
+### START OF GAME CALLS ###
+
 prompt "Welcome to Tic Tac Toe. Let's get started!"
-prompt 'Till how many wins would you like to play? (max 20)'
-
-win_limit = ''
-loop do
-  win_limit = gets.chomp.to_i
-  break if (1..20).cover?(win_limit)
-
-  prompt 'Invalid choice, please choose again'
-end
-WIN_LOOP_LIMIT = win_limit
-
-prompt 'Who may start? p = player, c = computer, a = alternate, r = random'
-starter_choice = ''
-loop do
-  starter_choice = gets.chomp.to_sym
-  break if %i(p c a r).include?(starter_choice)
-
-  prompt 'Invalid choice, please choose again'
-end
-starter_translation = { p: :player, c: :computer, a: :alternate, r: :random }
-STARTER_SETTING = starter_translation[starter_choice]
+WIN_LIMIT = input_win_limit
+STARTER_SETTING = input_starter_setting
 
 loop do
-  player_win_count = 0
-  computer_win_count = 0
+  win_counts = { player: 0, computer: 0 }
   starter = nil
 
   loop do
@@ -206,36 +243,24 @@ loop do
     current_player = starter
 
     loop do
-      display_board(board)
-      place_piece!(board, current_player)
-      current_player = alternate_player(current_player)
+      perform_turn(board, current_player)
       break if detect_winner(board) || board_full?(board)
+
+      current_player = alternate_player(current_player)
     end
 
     display_board(board)
-    winner = detect_winner(board)
-    if winner
-      if winner == 'player'
-        player_win_count += 1
-      else
-        computer_win_count += 1
-      end
+    process_round_score(board, win_counts)
+    break if win_limit_reached?(win_counts)
 
-      prompt "#{winner} won!"
-    elsif board_full?(board)
-      prompt "It's a tie!"
-    end
-
-    break if player_win_count >= WIN_LOOP_LIMIT ||
-             computer_win_count >= WIN_LOOP_LIMIT
-
-    prompt "Score is player #{player_win_count}, computer #{computer_win_count}"
+    prompt "Score is player #{win_counts[:player]}, "\
+           "computer #{win_counts[:computer]}"
     prompt 'Starting new game...'
     sleep 2
   end
 
-  prompt "Final score is player: #{player_win_count}"\
-         " vs computer: #{computer_win_count}"
+  prompt "Final score is player: #{win_counts[:player]}"\
+         " vs computer: #{win_counts[:computer]}"
   prompt 'Play again?'
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
