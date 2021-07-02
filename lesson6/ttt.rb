@@ -248,16 +248,7 @@ def display_final_score(win_counts)
          " vs computer: #{win_counts[:computer]}"
 end
 
-### START OF GAME CALLS ###
-
-prompt "Welcome to Tic Tac Toe. Let's get started!"
-WIN_LIMIT = input_win_limit
-STARTER_SETTING = input_starter_setting
-
-loop do
-  win_counts = { player: 0, computer: 0 }
-  starter = nil
-
+def play_game!(win_counts, starter)
   loop do
     board = initialize_board
     starter = pick_starter(starter)
@@ -277,6 +268,19 @@ loop do
     display_current_score(win_counts)
     start_new_game_message
   end
+end
+
+### START OF GAME CALLS ###
+
+prompt "Welcome to Tic Tac Toe. Let's get started!"
+WIN_LIMIT = input_win_limit
+STARTER_SETTING = input_starter_setting
+
+loop do
+  win_counts = { player: 0, computer: 0 }
+  starter = nil
+
+  play_game!(win_counts, starter)
 
   display_final_score(win_counts)
   break unless player_wants_to_continue?
