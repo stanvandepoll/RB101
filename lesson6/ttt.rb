@@ -227,6 +227,27 @@ def win_limit_reached?(win_counts)
     win_counts[:computer] >= WIN_LIMIT
 end
 
+def player_wants_to_continue?
+  prompt 'Play again?'
+  answer = gets.chomp
+  answer.downcase.start_with?('y')
+end
+
+def display_current_score(win_counts)
+  prompt "Score is player #{win_counts[:player]}, "\
+         "computer #{win_counts[:computer]}"
+end
+
+def start_new_game_message
+  prompt 'Starting new game...'
+  sleep 2
+end
+
+def display_final_score(win_counts)
+  prompt "Final score is player: #{win_counts[:player]}"\
+         " vs computer: #{win_counts[:computer]}"
+end
+
 ### START OF GAME CALLS ###
 
 prompt "Welcome to Tic Tac Toe. Let's get started!"
@@ -253,17 +274,12 @@ loop do
     process_round_score(board, win_counts)
     break if win_limit_reached?(win_counts)
 
-    prompt "Score is player #{win_counts[:player]}, "\
-           "computer #{win_counts[:computer]}"
-    prompt 'Starting new game...'
-    sleep 2
+    display_current_score(win_counts)
+    start_new_game_message
   end
 
-  prompt "Final score is player: #{win_counts[:player]}"\
-         " vs computer: #{win_counts[:computer]}"
-  prompt 'Play again?'
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  display_final_score(win_counts)
+  break unless player_wants_to_continue?
 end
 
 prompt "Thanks for playing Tic Tac Toe. Goodbye!"
