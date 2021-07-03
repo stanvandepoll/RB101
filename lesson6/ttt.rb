@@ -11,7 +11,13 @@ WINNING_LINES = HORIZONTAL_LINES + VERTICAL_LINES + DIAGONAL_LINES
 
 def display_board(brd, win_counts)
   system 'clear'
-  puts %{
+  puts rules_and_score_header(win_counts)
+  puts brd_string(brd)
+  puts ''
+end
+
+def rules_and_score_header(win_counts)
+%{
 -------------------
     TIC TAC TOE
 -------------------
@@ -19,7 +25,11 @@ You are #{PLAYER_MARKER}, computer is #{COMPUTER_MARKER}.
 Win #{WIN_LIMIT} games to win the whole match.
 games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
 -------------------
+}
+end
 
+def brd_string(brd)
+%{
 (1)|(2)|(3)
  #{brd[1]} | #{brd[2]} | #{brd[3]}
    |   |
@@ -31,7 +41,7 @@ games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
 (7)|(8)|(9)
  #{brd[7]} | #{brd[8]} | #{brd[9]}
    |   |
-  }
+}
 end
 
 def player_marks_square!(board)
