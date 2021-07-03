@@ -179,12 +179,12 @@ def input_win_limit
 
   win_limit = ''
   loop do
-    win_limit = gets.chomp.to_i
-    break if (1..20).to_a.include?(win_limit)
+    win_limit = gets.chomp
+    break if ('1'..'20').to_a.include?(win_limit)
 
     prompt 'Invalid choice, please choose again'
   end
-  win_limit
+  win_limit.to_i
 end
 
 def input_starter_setting
