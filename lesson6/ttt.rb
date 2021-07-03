@@ -9,8 +9,17 @@ VERTICAL_LINES = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 DIAGONAL_LINES = [[1, 5, 9], [3, 5, 7]]
 WINNING_LINES = HORIZONTAL_LINES + VERTICAL_LINES + DIAGONAL_LINES
 
-def display_board(brd)
+def display_board(brd, win_counts)
+  system 'clear'
   puts %{
+-------------------
+    TIC TAC TOE
+-------------------
+You are #{PLAYER_MARKER}, computer is #{COMPUTER_MARKER}.
+Win #{WIN_LIMIT} games to win the whole match.
+games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
+-------------------
+
 (1)|(2)|(3)
  #{brd[1]} | #{brd[2]} | #{brd[3]}
    |   |
@@ -204,8 +213,8 @@ def input_starter_setting
   starter_translation[starter_choice]
 end
 
-def perform_turn(board, current_player)
-  display_board(board)
+def perform_turn(board, current_player, win_counts)
+  display_board(board, win_counts)
   place_piece!(board, current_player)
 end
 
@@ -257,13 +266,13 @@ def play_game!(win_counts, starter)
     current_player = starter
 
     loop do
-      perform_turn(board, current_player)
+      perform_turn(board, current_player, win_counts)
       break if detect_winner(board) || board_full?(board)
 
       current_player = alternate_player(current_player)
     end
 
-    display_board(board)
+    display_board(board, win_counts)
     process_round_score(board, win_counts)
     break if win_limit_reached?(win_counts)
 
