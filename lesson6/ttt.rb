@@ -250,9 +250,22 @@ def win_limit_reached?(win_counts)
 end
 
 def player_wants_to_continue?
-  prompt 'Play again?'
-  answer = gets.chomp
-  answer.downcase.start_with?('y')
+  prompt 'Play again? yes/no'
+  validated_answer = nil
+
+  loop do
+    answer = gets.chomp
+    validated_answer = case answer
+      when 'yes' then true
+      when 'no' then false
+      else nil
+
+    break unless validated_answer.nil?
+
+    'Invalid input. Please try again'
+  end
+
+  validated_answer
 end
 
 def display_current_score(win_counts)
