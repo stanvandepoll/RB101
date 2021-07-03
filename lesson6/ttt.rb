@@ -23,7 +23,7 @@ def rules_and_score_header(win_counts)
       TIC TAC TOE
   -------------------
   You are #{PLAYER_MARKER}, computer is #{COMPUTER_MARKER}.
-  Win #{WIN_LIMIT} games to win the whole match.
+  Win #{WIN_LIMIT} rounds to win the whole game.
   games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
   -------------------
   )
@@ -265,8 +265,8 @@ def display_current_score(win_counts)
          "computer #{win_counts[:computer]}"
 end
 
-def start_new_game_message
-  prompt 'Starting new game...'
+def start_new_round_message
+  prompt 'Starting new round...'
   sleep 2
 end
 
@@ -293,7 +293,7 @@ def play_game!(win_counts, starter)
     break if win_limit_reached?(win_counts)
 
     display_current_score(win_counts)
-    start_new_game_message
+    start_new_round_message
   end
 end
 
