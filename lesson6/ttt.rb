@@ -83,8 +83,8 @@ def available_squares(board)
 end
 
 def computer_marks_square!(board)
-  return if perform_line_completion_move(board, COMPUTER_MARKER)
-  return if perform_line_completion_move(board, PLAYER_MARKER)
+  return if perform_line_completion_move!(board, COMPUTER_MARKER)
+  return if perform_line_completion_move!(board, PLAYER_MARKER)
 
   if available_squares(board).include?(MIDDLE_SQUARE)
     board[MIDDLE_SQUARE] = COMPUTER_MARKER
@@ -93,7 +93,7 @@ def computer_marks_square!(board)
   end
 end
 
-def perform_line_completion_move(board, marker)
+def perform_line_completion_move!(board, marker)
   at_risk_square = square_at_risk(board, marker)
   if at_risk_square
     board[at_risk_square] = COMPUTER_MARKER
@@ -215,12 +215,12 @@ def input_starter_setting
   starter_translation[starter_choice]
 end
 
-def perform_turn(board, current_player, win_counts)
+def perform_turn!(board, current_player, win_counts)
   display_board(board, win_counts)
   place_piece!(board, current_player)
 end
 
-def process_round_score(board, win_counts)
+def process_round_score!(board, win_counts)
   winner = detect_winner(board)
   if winner
     if winner == 'player'
@@ -254,7 +254,7 @@ def player_wants_to_continue?
 
     break unless validated_answer.nil?
 
-    'Invalid input. Please try again'
+    prompt 'Invalid input. Please try again'
   end
 
   validated_answer
@@ -281,19 +281,23 @@ def play_game!(win_counts, starter)
     starter = pick_starter(starter)
     current_player = starter
 
-    loop do
-      perform_turn(board, current_player, win_counts)
-      break if detect_winner(board) || board_full?(board)
-
-      current_player = alternate_player(current_player)
-    end
+    play_round!(board, current_player, win_counts)
 
     display_board(board, win_counts)
-    process_round_score(board, win_counts)
+    process_round_score!(board, win_counts)
     break if win_limit_reached?(win_counts)
 
     display_current_score(win_counts)
     start_new_round_message
+  end
+end
+
+def play_round!(board, current_player, win_counts)
+  loop do
+    perform_turn!(board, current_player, win_counts)
+    break if detect_winner(board) || board_full?(board)
+
+    current_player = alternate_player(current_player)
   end
 end
 
