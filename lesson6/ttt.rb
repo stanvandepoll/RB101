@@ -24,7 +24,7 @@ def rules_and_score_header(win_counts)
   -------------------
   You are #{PLAYER_MARKER}, computer is #{COMPUTER_MARKER}.
   Win #{WIN_LIMIT} rounds to win the whole game.
-  games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
+  Rounds won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
   -------------------
   )
 end
