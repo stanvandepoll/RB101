@@ -18,31 +18,31 @@ def display_board(brd, win_counts)
 end
 
 def rules_and_score_header(win_counts)
-%{
--------------------
-    TIC TAC TOE
--------------------
-You are #{PLAYER_MARKER}, computer is #{COMPUTER_MARKER}.
-Win #{WIN_LIMIT} games to win the whole match.
-games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
--------------------
-}
+  %(
+  -------------------
+      TIC TAC TOE
+  -------------------
+  You are #{PLAYER_MARKER}, computer is #{COMPUTER_MARKER}.
+  Win #{WIN_LIMIT} games to win the whole match.
+  games won; you: #{win_counts[:player]}, computer: #{win_counts[:computer]}
+  -------------------
+  )
 end
 
 def brd_string(brd)
-%{
-(1)|(2)|(3)
- #{brd[1]} | #{brd[2]} | #{brd[3]}
-   |   |
----+---+---
-(4)|(5)|(6)
- #{brd[4]} | #{brd[5]} | #{brd[6]}
-   |   |
----+---+---
-(7)|(8)|(9)
- #{brd[7]} | #{brd[8]} | #{brd[9]}
-   |   |
-}
+  %(
+  (1)|(2)|(3)
+   #{brd[1]} | #{brd[2]} | #{brd[3]}
+     |   |
+  ---+---+---
+  (4)|(5)|(6)
+   #{brd[4]} | #{brd[5]} | #{brd[6]}
+     |   |
+  ---+---+---
+  (7)|(8)|(9)
+   #{brd[7]} | #{brd[8]} | #{brd[9]}
+     |   |
+  )
 end
 
 def player_marks_square!(board)
@@ -55,9 +55,10 @@ def input_selection(board)
   selected_square = ''
   loop do
     selected_square = gets.chomp
-    if ('1'..(BOARD_SIZE.to_s)).to_a.include?(selected_square)
-      break if square_available?(selected_square: selected_square.to_i, board: board)
-    end
+    break if ('1'..(BOARD_SIZE.to_s)).to_a.include?(selected_square) &&
+             square_available?(
+               selected_square: selected_square.to_i, board: board
+             )
 
     prompt 'Invalid choice, please choose again'
   end
@@ -82,8 +83,8 @@ def available_squares(board)
 end
 
 def computer_marks_square!(board)
-  return if perform_offensive_move(board)
-  return if perform_defensive_move(board)
+  return if perform_line_completion_move(board, COMPUTER_MARKER)
+  return if perform_line_completion_move(board, PLAYER_MARKER)
 
   if available_squares(board).include?(MIDDLE_SQUARE)
     board[MIDDLE_SQUARE] = COMPUTER_MARKER
@@ -92,10 +93,10 @@ def computer_marks_square!(board)
   end
 end
 
-def perform_offensive_move(board)
-  offensive_square = square_at_risk(board, COMPUTER_MARKER)
-  if offensive_square
-    board[offensive_square] = COMPUTER_MARKER
+def perform_line_completion_move(board, marker)
+  at_risk_square = square_at_risk(board, marker)
+  if at_risk_square
+    board[at_risk_square] = COMPUTER_MARKER
     true
   else
     false
@@ -121,16 +122,6 @@ def at_risk_square_in(line:, board:, marking:)
      line_values.count(INITIAL_MARKER) == 1
     at_risk_line_index = line_values.index(INITIAL_MARKER)
     line[at_risk_line_index]
-  end
-end
-
-def perform_defensive_move(board)
-  defensive_square = square_at_risk(board, PLAYER_MARKER)
-  if defensive_square
-    board[defensive_square] = COMPUTER_MARKER
-    true
-  else
-    false
   end
 end
 
@@ -255,10 +246,11 @@ def player_wants_to_continue?
 
   loop do
     answer = gets.chomp
-    validated_answer = case answer
+    validated_answer =
+      case answer
       when 'yes' then true
       when 'no' then false
-      else nil
+      end
 
     break unless validated_answer.nil?
 
