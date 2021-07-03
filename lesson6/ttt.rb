@@ -34,12 +34,14 @@ def input_selection(board)
   prompt "Place a marker #{join_or(available_squares(board))}"
   selected_square = ''
   loop do
-    selected_square = gets.chomp.to_i
-    break if square_available?(selected_square: selected_square, board: board)
+    selected_square = gets.chomp
+    if ('1'..'9').to_a.include?(selected_square)
+      break if square_available?(selected_square: selected_square.to_i, board: board)
+    end
 
     prompt 'Invalid choice, please choose again'
   end
-  selected_square
+  selected_square.to_i
 end
 
 def join_or(array, delimiter=', ', end_word='or')
