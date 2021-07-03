@@ -1,5 +1,3 @@
-require 'pry'
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -8,6 +6,9 @@ HORIZONTAL_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 VERTICAL_LINES = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 DIAGONAL_LINES = [[1, 5, 9], [3, 5, 7]]
 WINNING_LINES = HORIZONTAL_LINES + VERTICAL_LINES + DIAGONAL_LINES
+LINE_LENGTH = 3
+BOARD_SIZE = 9
+MIDDLE_SQUARE = 5
 
 def display_board(brd, win_counts)
   system 'clear'
@@ -54,7 +55,7 @@ def input_selection(board)
   selected_square = ''
   loop do
     selected_square = gets.chomp
-    if ('1'..'9').to_a.include?(selected_square)
+    if ('1'..(BOARD_SIZE.to_s)).to_a.include?(selected_square)
       break if square_available?(selected_square: selected_square.to_i, board: board)
     end
 
@@ -84,8 +85,8 @@ def computer_marks_square!(board)
   return if perform_offensive_move(board)
   return if perform_defensive_move(board)
 
-  if available_squares(board).include?(5)
-    board[5] = COMPUTER_MARKER
+  if available_squares(board).include?(MIDDLE_SQUARE)
+    board[MIDDLE_SQUARE] = COMPUTER_MARKER
   else
     board[available_squares(board).sample] = COMPUTER_MARKER
   end
@@ -116,7 +117,7 @@ end
 
 def at_risk_square_in(line:, board:, marking:)
   line_values = board.values_at(*line)
-  if line_values.count(marking) == 2 &&
+  if line_values.count(marking) == (LINE_LENGTH - 1) &&
      line_values.count(INITIAL_MARKER) == 1
     at_risk_line_index = line_values.index(INITIAL_MARKER)
     line[at_risk_line_index]
@@ -164,7 +165,7 @@ end
 
 def initialize_board
   new_board = {}
-  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
+  (1..BOARD_SIZE).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
