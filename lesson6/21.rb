@@ -67,6 +67,8 @@ def display_round(player_cards, dealer_cards, dealer_turn = false)
                                     .map(&:last)
                                     .slice(1..-1))
                   end
+
+  system 'clear'
   puts "Dealer has #{to_sentence(dealer_values)}"
   puts "Dealer points: #{total(dealer_cards)}" if dealer_turn
 
@@ -100,13 +102,42 @@ def busted?(hand)
   total(hand) > 21
 end
 
-def play_again?
-  puts "-------------"
-  puts "Do you want to play again? (y or n)"
-  answer = gets.chomp
-  answer.downcase.start_with?('y')
+def player_wants_to_continue?
+  prompt 'Play again? yes/no'
+  validated_answer = nil
+
+  loop do
+    answer = gets.chomp.downcase
+    validated_answer =
+      case answer
+      when 'yes' then true
+      when 'no' then false
+      end
+
+    break unless validated_answer.nil?
+
+    prompt 'Invalid input. Please try again'
+  end
+
+  validated_answer
 end
 
+def request_hit_or_stay
+  answer = nil
+  loop do
+    puts "Would you like to (h)it or (s)tay?"
+    answer = gets.chomp.downcase
+    break if ['h', 's'].include?(answer)
+
+    puts "Sorry, must enter 'h' or 's'."
+  end
+
+  { h: :hit, s: :stay }[answer.to_sym]
+end
+
+### Start of game calls ###
+
+system 'clear'
 puts "Welcome to 21"
 
 loop do
@@ -118,15 +149,8 @@ loop do
     display_round(player_cards, dealer_cards)
     break if busted?(player_cards)
 
-    answer = nil
-    loop do
-      puts "Would you like to (h)it or (s)tay?"
-      answer = gets.chomp.downcase
-      break if ['h', 's'].include?(answer)
-
-      puts "Sorry, must enter 'h' or 's'."
-    end
-    break if answer == 's'
+    answer = request_hit_or_stay
+    break if answer == :stay
 
     player_cards.append(cards.pop)
   end
@@ -159,5 +183,5 @@ loop do
 
   puts call_winner(player_cards, dealer_cards)
 
-  break unless play_again?
+  break unless player_wants_to_continue?
 end
