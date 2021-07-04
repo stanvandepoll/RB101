@@ -55,14 +55,16 @@ def input_selection(board)
   selected_square = ''
   loop do
     selected_square = gets.chomp
-    break if ('1'..(BOARD_SIZE.to_s)).to_a.include?(selected_square) &&
-             square_available?(
-               selected_square: selected_square.to_i, board: board
-             )
+    break if selection_valid?(board, selected_square)
 
     prompt 'Invalid choice, please choose again'
   end
   selected_square.to_i
+end
+
+def selection_valid?(board, selected_square)
+  ('1'..(BOARD_SIZE.to_s)).to_a.include?(selected_square) &&
+    square_available?(selected_square: selected_square.to_i, board: board)
 end
 
 def join_or(array, delimiter=', ', end_word='or')
