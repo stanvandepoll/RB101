@@ -29,7 +29,7 @@ end
 def raw_score(card_value)
   if card_value == 'A'
     11
-  elsif card_value.to_i == 0 # J, Q, K
+  elsif %w(J Q K).include?(card_value)
     10
   else
     card_value.to_i
@@ -54,7 +54,9 @@ def display_round(player_cards, dealer_cards, dealer_turn: false)
 
   system 'clear'
   display_card_values(player: :dealer, values: dealer_values)
-  display_points(player: :dealer, points: total(dealer_cards), show_points: dealer_turn)
+  display_points(
+    player: :dealer, points: total(dealer_cards), show_points: dealer_turn
+  )
 
   player_values = player_cards.map(&:last)
   display_card_values(player: :player, values: player_values)
