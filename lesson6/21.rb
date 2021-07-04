@@ -29,17 +29,25 @@ deck = [
 def total(cards)
   values = cards.map(&:last)
 
-  sum = 0
-  values.each do |value|
-    sum += if value == 'A'
-             11
-           elsif value.to_i == 0 # J, Q, K
-             10
-           else
-             value.to_i
-           end
+  raw_sum = values.sum do |value|
+    raw_score(value)
   end
 
+  corrected_for_aces(raw_sum, values)
+end
+
+def raw_score(card_value)
+  if card_value == 'A'
+    11
+  elsif card_value.to_i == 0 # J, Q, K
+    10
+  else
+    card_value.to_i
+  end
+end
+
+def corrected_for_aces(raw_sum, values)
+  sum = raw_sum
   values.select { |value| value == "A" }.count.times do
     sum -= 10 if sum > 21
   end
