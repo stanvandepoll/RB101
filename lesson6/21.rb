@@ -10,6 +10,8 @@
 
 require 'pry'
 
+DISPLAY_SPACER = '-----------------------------------------'
+
 deck = [
   ['H', 'A'], ['S', 'A'], ['D', 'A'], ['C', 'A'],
   ['H', '2'], ['S', '2'], ['D', '2'], ['C', '2'],
@@ -60,23 +62,35 @@ def to_sentence(array)
 end
 
 def display_round(player_cards, dealer_cards, dealer_turn: false)
-  dealer_values = if dealer_turn
-                    dealer_cards.map(&:last)
-                  else
-                    ['unknown card'].concat(dealer_cards
-                                    .map(&:last)
-                                    .slice(1..-1))
-                  end
+  dealer_values = displayable_dealer_values(dealer_cards, dealer_turn)
 
   system 'clear'
-  puts "Dealer has #{to_sentence(dealer_values)}"
-  puts "Dealer points: #{total(dealer_cards)}" if dealer_turn
+  display_card_values(player: :dealer, values: dealer_values)
+  display_points(player: :dealer, points: total(dealer_cards)) if dealer_turn
 
   player_values = player_cards.map(&:last)
-  puts "Player has #{to_sentence(player_values)}"
-  puts "Player points: #{total(player_cards)}"
-  puts ''
-  puts ''
+  display_card_values(player: :player, values: player_values)
+  display_points(player: :player, points: total(player_cards))
+end
+
+def displayable_dealer_values(dealer_cards, dealer_turn)
+  if dealer_turn
+    dealer_cards.map(&:last)
+  else
+    ['unknown card'].concat(dealer_cards
+                    .map(&:last)
+                    .slice(1..-1))
+  end
+end
+
+def display_card_values(player:, values:)
+  puts "#{player.to_s.capitalize} has #{to_sentence(values)}."
+  puts DISPLAY_SPACER
+end
+
+def display_points(player:, points:)
+  puts "#{player.to_s.capitalize} points: #{points}."
+  puts DISPLAY_SPACER
 end
 
 def busted?(hand)
