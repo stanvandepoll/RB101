@@ -27,12 +27,10 @@ def total(cards)
 end
 
 def raw_score(card_value)
-  if card_value == 'A'
-    11
-  elsif %w(J Q K).include?(card_value)
-    10
-  else
-    card_value.to_i
+  case card_value
+  when 'A' then 11
+  when *%w(J Q K) then 10
+  else card_value.to_i
   end
 end
 
