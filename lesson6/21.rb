@@ -66,7 +66,7 @@ def display_round(player_cards, dealer_cards, dealer_turn: false)
 
   system 'clear'
   display_card_values(player: :dealer, values: dealer_values)
-  display_points(player: :dealer, points: total(dealer_cards)) if dealer_turn
+  display_points(player: :dealer, points: total(dealer_cards), show_points: dealer_turn)
 
   player_values = player_cards.map(&:last)
   display_card_values(player: :player, values: player_values)
@@ -85,11 +85,10 @@ end
 
 def display_card_values(player:, values:)
   puts "#{player.to_s.capitalize} has #{to_sentence(values)}."
-  puts DISPLAY_SPACER
 end
 
-def display_points(player:, points:)
-  puts "#{player.to_s.capitalize} points: #{points}."
+def display_points(player:, points:, show_points: true)
+  puts "#{player.to_s.capitalize} points: #{points}." if show_points
   puts DISPLAY_SPACER
 end
 
@@ -98,7 +97,7 @@ def busted?(hand)
 end
 
 def player_wants_to_continue?
-  prompt 'Play again? yes/no'
+  puts 'Play again? yes/no'
   validated_answer = nil
 
   loop do
@@ -111,7 +110,7 @@ def player_wants_to_continue?
 
     break unless validated_answer.nil?
 
-    prompt 'Invalid input. Please try again'
+    puts 'Invalid input. Please try again'
   end
 
   validated_answer
@@ -153,12 +152,12 @@ def after_player_turns_message(player_cards)
 end
 
 def dealer_turn!(player_cards, dealer_cards, cards)
+  display_round(player_cards, dealer_cards, dealer_turn: true)
   return :done if dealer_should_stop(player_cards, dealer_cards)
 
-  puts 'Dealer hits'
+  puts 'Dealer hits...'
+  sleep(3)
   dealer_cards.append(cards.pop)
-  display_round(player_cards, dealer_cards, dealer_turn: true)
-  sleep(5)
 
   :continue
 end
@@ -170,6 +169,7 @@ def dealer_should_stop(player_cards, dealer_cards)
 end
 
 def after_dealer_turns_message(dealer_cards)
+  sleep(3)
   if busted?(dealer_cards)
     puts "Dealer went bust with a #{dealer_cards.last.last}"
   else
@@ -200,7 +200,7 @@ def determine_winner(player_cards, dealer_cards)
   end
 end
 
-def results_string(winner)
+def result_string(winner)
   if winner.nil?
     "It's a tie."
   else
@@ -212,6 +212,7 @@ end
 
 system 'clear'
 puts "Welcome to 21"
+sleep(2)
 
 loop do
   cards = deck.shuffle
