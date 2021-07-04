@@ -205,7 +205,7 @@ def input_starter_setting
 
   starter_choice = ''
   loop do
-    starter_choice = gets.chomp.to_sym
+    starter_choice = gets.chomp.downcase.to_sym
     break if %i(p c a r).include?(starter_choice)
 
     prompt 'Invalid choice, please choose again'
@@ -245,7 +245,7 @@ def player_wants_to_continue?
   validated_answer = nil
 
   loop do
-    answer = gets.chomp
+    answer = gets.chomp.downcase
     validated_answer =
       case answer
       when 'yes' then true
