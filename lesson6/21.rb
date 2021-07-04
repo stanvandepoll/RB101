@@ -187,6 +187,7 @@ def results_string(winner)
     "It's a tie."
   else
     "#{winner.to_s.capitalize} wins!"
+  end
 end
 
 ### Start of game calls ###
