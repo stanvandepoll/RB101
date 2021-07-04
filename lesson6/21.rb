@@ -79,25 +79,6 @@ def display_round(player_cards, dealer_cards, dealer_turn = false)
   puts ''
 end
 
-def call_winner(player_cards, dealer_cards)
-  if busted?(player_cards)
-    return "Dealer wins!"
-  elsif busted?(dealer_cards)
-    return "Player wins!"
-  end
-
-  player_points = total(player_cards)
-  dealer_points = total(dealer_cards)
-
-  if player_points > dealer_points
-    "Player wins!"
-  elsif player_points < dealer_points
-    "Dealer wins!"
-  else
-    "It's a tie"
-  end
-end
-
 def busted?(hand)
   total(hand) > 21
 end
@@ -124,13 +105,13 @@ end
 
 def player_turn!(player_cards, dealer_cards, cards)
   display_round(player_cards, dealer_cards)
-  return 'done' if busted?(player_cards)
+  return :done if busted?(player_cards)
 
   answer = request_hit_or_stay
-  return 'done' if answer == :stay
+  return :done if answer == :stay
 
   player_cards.append(cards.pop)
-  'continue'
+  :continue
 end
 
 def request_hit_or_stay
@@ -146,6 +127,68 @@ def request_hit_or_stay
   { h: :hit, s: :stay }[answer.to_sym]
 end
 
+def after_player_turns_message(player_cards)
+  if busted?(player_cards)
+    puts "You went bust with a #{player_cards.last.last}"
+  else
+    puts "You chose to stay!"
+  end
+
+  puts "Dealer's turn..."
+  sleep(2)
+end
+
+def dealer_turn!(player_cards, dealer_cards, cards)
+  return :done if total(dealer_cards) >= 17 ||
+                   busted?(dealer_cards) ||
+                   busted?(player_cards)
+
+  puts 'Dealer hits'
+  dealer_cards.append(cards.pop)
+  display_round(player_cards, dealer_cards, true)
+  sleep(5)
+
+  :continue
+end
+
+def after_dealer_turns_message(dealer_cards)
+  if busted?(dealer_cards)
+    puts "Dealer went bust with a #{dealer_cards.last.last}"
+  else
+    puts "Dealer chose to stay!"
+  end
+end
+
+def display_winner(player_cards, dealer_cards)
+  winner = determine_winner(player_cards, dealer_cards)
+
+  puts result_string(winner)
+end
+
+def determine_winner(player_cards, dealer_cards)
+  if busted?(player_cards)
+    return :dealer
+  elsif busted?(dealer_cards)
+    return :player
+  end
+
+  player_points = total(player_cards)
+  dealer_points = total(dealer_cards)
+
+  if player_points > dealer_points
+    :player
+  elsif player_points < dealer_points
+    :dealer
+  end
+end
+
+def results_string(winner)
+  if winner.nil?
+    "It's a tie."
+  else
+    "#{winner.to_s.capitalize} wins!"
+end
+
 ### Start of game calls ###
 
 system 'clear'
@@ -157,34 +200,17 @@ loop do
   dealer_cards = [cards.pop, cards.pop]
 
   loop do
-  if busted?(player_cards)
-    puts "You went bust with a #{player_cards.last.last}"
-  else
-    puts "You chose to stay!"
-    break if player_turn!(player_cards, dealer_cards, cards) == 'done'
+    break if player_turn!(player_cards, dealer_cards, cards) == :done
   end
 
-  puts "Dealer's turn..."
-  sleep(2)
+  after_player_turns_message(player_cards)
 
   loop do
-    break if total(dealer_cards) >= 17 ||
-             busted?(dealer_cards) ||
-             busted?(player_cards)
-
-    puts 'Dealer hits'
-    dealer_cards.append(cards.pop)
-    display_round(player_cards, dealer_cards, true)
-    sleep(5)
+    break if dealer_turn!(player_cards, dealer_cards, cards) == :done
   end
 
-  if busted?(dealer_cards)
-    puts "Dealer went bust with a #{dealer_cards.last.last}"
-  else
-    puts "Dealer chose to stay!"
-  end
-
-  puts call_winner(player_cards, dealer_cards)
+  after_dealer_turns_message(dealer_cards)
+  display_winner(player_cards, dealer_cards)
 
   break unless player_wants_to_continue?
 end
