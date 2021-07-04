@@ -122,6 +122,17 @@ def player_wants_to_continue?
   validated_answer
 end
 
+def player_turn!(player_cards, dealer_cards, cards)
+  display_round(player_cards, dealer_cards)
+  return 'done' if busted?(player_cards)
+
+  answer = request_hit_or_stay
+  return 'done' if answer == :stay
+
+  player_cards.append(cards.pop)
+  'continue'
+end
+
 def request_hit_or_stay
   answer = nil
   loop do
@@ -146,19 +157,11 @@ loop do
   dealer_cards = [cards.pop, cards.pop]
 
   loop do
-    display_round(player_cards, dealer_cards)
-    break if busted?(player_cards)
-
-    answer = request_hit_or_stay
-    break if answer == :stay
-
-    player_cards.append(cards.pop)
-  end
-
   if busted?(player_cards)
     puts "You went bust with a #{player_cards.last.last}"
   else
     puts "You chose to stay!"
+    break if player_turn!(player_cards, dealer_cards, cards) == 'done'
   end
 
   puts "Dealer's turn..."
