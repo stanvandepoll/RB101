@@ -59,7 +59,7 @@ def to_sentence(array)
   "#{array[0..-2].join(', ')} and #{array.last}"
 end
 
-def display_round(player_cards, dealer_cards, dealer_turn = false)
+def display_round(player_cards, dealer_cards, dealer_turn: false)
   dealer_values = if dealer_turn
                     dealer_cards.map(&:last)
                   else
@@ -139,16 +139,20 @@ def after_player_turns_message(player_cards)
 end
 
 def dealer_turn!(player_cards, dealer_cards, cards)
-  return :done if total(dealer_cards) >= 17 ||
-                   busted?(dealer_cards) ||
-                   busted?(player_cards)
+  return :done if dealer_should_stop(player_cards, dealer_cards)
 
   puts 'Dealer hits'
   dealer_cards.append(cards.pop)
-  display_round(player_cards, dealer_cards, true)
+  display_round(player_cards, dealer_cards, dealer_turn: true)
   sleep(5)
 
   :continue
+end
+
+def dealer_should_stop(player_cards, dealer_cards)
+  total(dealer_cards) >= 17 ||
+    busted?(dealer_cards) ||
+    busted?(player_cards)
 end
 
 def after_dealer_turns_message(dealer_cards)
