@@ -303,6 +303,7 @@ end
 
 ### START OF GAME CALLS ###
 
+system 'clear'
 prompt "Welcome to Tic Tac Toe. Let's get started!"
 WIN_LIMIT = input_win_limit
 STARTER_SETTING = input_starter_setting
