@@ -55,14 +55,14 @@ def input_selection(board)
   selected_square = ''
   loop do
     selected_square = gets.chomp
-    break if selection_valid?(board, selected_square)
+    break if square_selection_valid?(board, selected_square)
 
     prompt 'Invalid choice, please choose again'
   end
   selected_square.to_i
 end
 
-def selection_valid?(board, selected_square)
+def square_selection_valid?(board, selected_square)
   ('1'..(BOARD_SIZE.to_s)).to_a.include?(selected_square) &&
     square_available?(selected_square: selected_square.to_i, board: board)
 end
@@ -225,16 +225,27 @@ end
 def process_round_score!(board, win_counts)
   winner = detect_winner(board)
   if winner
-    if winner == 'player'
-      win_counts[:player] += 1
-    else
-      win_counts[:computer] += 1
-    end
-
-    prompt "#{winner} won!"
+    process_win_score!(winner, win_counts)
+    display_winner(winner)
   elsif board_full?(board)
-    prompt "It's a tie!"
+    display_tie
   end
+end
+
+def process_win_score!(winner, win_counts)
+  if winner == 'player'
+    win_counts[:player] += 1
+  else
+    win_counts[:computer] += 1
+  end
+end
+
+def display_winner(winner)
+  prompt "#{winner} won!"
+end
+
+def display_tie
+  prompt "It's a tie!"
 end
 
 def win_limit_reached?(win_counts)
