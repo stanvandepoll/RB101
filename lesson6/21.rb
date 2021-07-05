@@ -1,20 +1,11 @@
 DISPLAY_SPACER = "-----------------------------------------\n\n"
+SUITS = %w(H D S C)
+VALUES = %w(2 3 4 5 6 7 8 9 10 J Q K A)
+DECK = SUITS.product(VALUES)
 
-deck = [
-  ['H', 'A'], ['S', 'A'], ['D', 'A'], ['C', 'A'],
-  ['H', '2'], ['S', '2'], ['D', '2'], ['C', '2'],
-  ['H', '3'], ['S', '3'], ['D', '3'], ['C', '3'],
-  ['H', '4'], ['S', '4'], ['D', '4'], ['C', '4'],
-  ['H', '5'], ['S', '5'], ['D', '5'], ['C', '5'],
-  ['H', '6'], ['S', '6'], ['D', '6'], ['C', '6'],
-  ['H', '7'], ['S', '7'], ['D', '7'], ['C', '7'],
-  ['H', '8'], ['S', '8'], ['D', '8'], ['C', '8'],
-  ['H', '9'], ['S', '9'], ['D', '9'], ['C', '9'],
-  ['H', '10'], ['S', '10'], ['D', '10'], ['C', '10'],
-  ['H', 'J'], ['S', 'J'], ['D', 'J'], ['C', 'J'],
-  ['H', 'Q'], ['S', 'Q'], ['D', 'Q'], ['C', 'Q'],
-  ['H', 'K'], ['S', 'K'], ['D', 'K'], ['C', 'K']
-]
+def prompt(msg)
+  puts "=> #{msg}"
+end
 
 def total(cards)
   values = cards.map(&:last)
@@ -23,7 +14,7 @@ def total(cards)
     raw_score(value)
   end
 
-  corrected_for_aces(raw_sum, values)
+  total_corrected_for_aces(raw_sum, values)
 end
 
 def raw_score(card_value)
@@ -34,7 +25,7 @@ def raw_score(card_value)
   end
 end
 
-def corrected_for_aces(raw_sum, values)
+def total_corrected_for_aces(raw_sum, values)
   sum = raw_sum
   values.select { |value| value == "A" }.count.times do
     sum -= 10 if sum > 21
@@ -72,11 +63,11 @@ def displayable_dealer_values(dealer_cards, dealer_turn)
 end
 
 def display_card_values(player:, values:)
-  puts "#{player.to_s.capitalize} has #{to_sentence(values)}."
+  prompt "#{player.to_s.capitalize} has #{to_sentence(values)}."
 end
 
 def display_points(player:, points:, show_points: true)
-  puts "#{player.to_s.capitalize} points: #{points}." if show_points
+  prompt "#{player.to_s.capitalize} points: #{points}." if show_points
   puts DISPLAY_SPACER
 end
 
@@ -85,7 +76,7 @@ def busted?(hand)
 end
 
 def player_wants_to_continue?
-  puts 'Play again? yes/no'
+  prompt 'Play again? yes/no'
   validated_answer = nil
 
   loop do
@@ -98,7 +89,7 @@ def player_wants_to_continue?
 
     break unless validated_answer.nil?
 
-    puts 'Invalid input. Please try again'
+    prompt 'Invalid input. Please try again'
   end
 
   validated_answer
@@ -118,11 +109,11 @@ end
 def request_hit_or_stay
   answer = nil
   loop do
-    puts "Would you like to (h)it or (s)tay?"
+    prompt "Would you like to (h)it or (s)tay?"
     answer = gets.chomp.downcase
     break if ['h', 's'].include?(answer)
 
-    puts "Sorry, must enter 'h' or 's'."
+    prompt "Sorry, must enter 'h' or 's'."
   end
 
   { h: :hit, s: :stay }[answer.to_sym]
@@ -130,12 +121,12 @@ end
 
 def after_player_turns_message(player_cards)
   if busted?(player_cards)
-    puts "You went bust with a #{player_cards.last.last}"
+    prompt "You went bust with a #{player_cards.last.last}"
   else
-    puts "You chose to stay!"
+    prompt "You chose to stay!"
   end
 
-  puts "Dealer's turn..."
+  prompt "Dealer's turn..."
   sleep(2)
 end
 
@@ -143,7 +134,7 @@ def dealer_turn!(player_cards, dealer_cards, cards)
   display_round(player_cards, dealer_cards, dealer_turn: true)
   return :done if dealer_should_stop(player_cards, dealer_cards)
 
-  puts 'Dealer hits...'
+  prompt 'Dealer hits...'
   sleep(3)
   dealer_cards.append(cards.pop)
 
@@ -159,16 +150,16 @@ end
 def after_dealer_turns_message(dealer_cards)
   sleep(3)
   if busted?(dealer_cards)
-    puts "Dealer went bust with a #{dealer_cards.last.last}"
+    prompt "Dealer went bust with a #{dealer_cards.last.last}"
   else
-    puts "Dealer chose to stay!"
+    prompt "Dealer chose to stay!"
   end
 end
 
 def display_winner(player_cards, dealer_cards)
   winner = determine_winner(player_cards, dealer_cards)
 
-  puts result_string(winner)
+  prompt result_string(winner)
 end
 
 def determine_winner(player_cards, dealer_cards)
@@ -199,11 +190,11 @@ end
 ### Start of game calls ###
 
 system 'clear'
-puts "Welcome to 21"
+prompt "Welcome to 21"
 sleep(2)
 
 loop do
-  cards = deck.shuffle
+  cards = DECK.shuffle
   player_cards = [cards.pop, cards.pop]
   dealer_cards = [cards.pop, cards.pop]
 
