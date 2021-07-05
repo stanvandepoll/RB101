@@ -1,6 +1,7 @@
 DISPLAY_SPACER = "-----------------------------------------\n\n"
 SUITS = %w(H D S C)
 VALUES = %w(2 3 4 5 6 7 8 9 10 J Q K A)
+MAX_GAME_SCORE = 21
 DECK = SUITS.product(VALUES)
 
 def prompt(msg)
@@ -20,7 +21,7 @@ end
 def raw_score(card_value)
   case card_value
   when 'A' then 11
-  when *%w(J Q K) then 10
+  when 'J', 'Q', 'K' then 10
   else card_value.to_i
   end
 end
@@ -28,7 +29,7 @@ end
 def total_corrected_for_aces(raw_sum, values)
   sum = raw_sum
   values.select { |value| value == "A" }.count.times do
-    sum -= 10 if sum > 21
+    sum -= 10 if sum > MAX_GAME_SCORE
   end
 
   sum
@@ -72,7 +73,7 @@ def display_points(player:, points:, show_points: true)
 end
 
 def busted?(hand)
-  total(hand) > 21
+  total(hand) > MAX_GAME_SCORE
 end
 
 def player_wants_to_continue?
@@ -142,7 +143,7 @@ def dealer_turn!(player_cards, dealer_cards, cards)
 end
 
 def dealer_should_stop(player_cards, dealer_cards)
-  total(dealer_cards) >= 17 ||
+  total(dealer_cards) >= (MAX_GAME_SCORE - 4) ||
     busted?(dealer_cards) ||
     busted?(player_cards)
 end
@@ -206,7 +207,7 @@ end
 ### Start of game calls ###
 
 system 'clear'
-prompt "Welcome to 21"
+prompt "Welcome to #{MAX_GAME_SCORE}"
 sleep(2)
 
 loop do
