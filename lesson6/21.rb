@@ -110,14 +110,14 @@ end
 def request_hit_or_stay
   answer = nil
   loop do
-    prompt "Would you like to (h)it or (s)tay?"
+    prompt "Would you like to [h]it or [s]tay?"
     answer = gets.chomp.downcase
-    break if ['h', 's'].include?(answer)
+    break if ['h', 'hit', 's', 'stay'].include?(answer)
 
     prompt "Sorry, must enter 'h' or 's'."
   end
 
-  { h: :hit, s: :stay }[answer.to_sym]
+  answer.start_with?('h') ? :hit : :stay
 end
 
 def after_player_turns_message(player_cards)
