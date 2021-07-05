@@ -187,6 +187,22 @@ def result_string(winner)
   end
 end
 
+def player_round!(player_cards, dealer_cards, cards)
+  loop do
+    break if player_turn!(player_cards, dealer_cards, cards) == :done
+  end
+
+  after_player_turns_message(player_cards)
+end
+
+def dealer_round!(player_cards, dealer_cards, cards)
+  loop do
+    break if dealer_turn!(player_cards, dealer_cards, cards) == :done
+  end
+
+  after_dealer_turns_message(dealer_cards)
+end
+
 ### Start of game calls ###
 
 system 'clear'
@@ -198,18 +214,9 @@ loop do
   player_cards = [cards.pop, cards.pop]
   dealer_cards = [cards.pop, cards.pop]
 
-  loop do
-    break if player_turn!(player_cards, dealer_cards, cards) == :done
-  end
+  player_round!(player_cards, dealer_cards, cards)
+  dealer_round!(player_cards, dealer_cards, cards) unless busted?(player_cards)
 
-  after_player_turns_message(player_cards)
-
-  loop do
-    break if dealer_turn!(player_cards, dealer_cards, cards) == :done
-  end
-
-  after_dealer_turns_message(dealer_cards)
   display_winner(player_cards, dealer_cards)
-
   break unless player_wants_to_continue?
 end
