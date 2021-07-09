@@ -17,3 +17,5 @@ def minilang(commands_string)
   end
   nil
 end
+
+minilang('3 PUSH 5 MOD PUSH 7 PUSH 3 PUSH 5 PUSH 4 MULT ADD SUB DIV PRINT')
